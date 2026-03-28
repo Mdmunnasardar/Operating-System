@@ -28,27 +28,57 @@ int main() {
     });
 
     int time = 0;
+    vector<int> timeline;
 
-    cout << "\nGantt Chart:\n";
     for (int i = 0; i < n; i++) {
         if (time < p[i].at)
             time = p[i].at;
 
-        cout << "| " << p[i].pid << " ";
+        timeline.push_back(time);
+
         time += p[i].bt;
 
         p[i].ct = time;
         p[i].tat = p[i].ct - p[i].at;
         p[i].wt = p[i].tat - p[i].bt;
     }
+
+    timeline.push_back(time);
+
+    cout << "\nGantt Chart:\n";
+
+    for (int i = 0; i < n; i++) {
+        cout << "--------";
+    }
+    cout << "-\n";
+
+    for (int i = 0; i < n; i++) {
+        cout << "|  " << p[i].pid << "  ";
+    }
     cout << "|\n";
+
+    for (int i = 0; i < n; i++) {
+        cout << "--------";
+    }
+    cout << "-\n";
+
+    for (int i = 0; i <= n; i++) {
+        cout << timeline[i] << "\t";
+    }
+    cout << endl;
 
     float total_wt = 0, total_tat = 0;
 
-    cout << "\nPID\tAT\tBT\tWT\tTAT\n";
+    cout << "\nPID\tAT\tBT\tCT\tTAT\tWT\n";
+    cout << "----------------------------------------\n";
+
     for (auto proc : p) {
-        cout << proc.pid << "\t" << proc.at << "\t" << proc.bt << "\t"
-             << proc.wt << "\t" << proc.tat << endl;
+        cout << proc.pid << "\t"
+             << proc.at << "\t"
+             << proc.bt << "\t"
+             << proc.ct << "\t"
+             << proc.tat << "\t"
+             << proc.wt << endl;
 
         total_wt += proc.wt;
         total_tat += proc.tat;
