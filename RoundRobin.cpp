@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <algorithm>
 using namespace std;
 
 struct Process {
@@ -11,6 +10,7 @@ struct Process {
 
 int main() {
     int n, tq;
+
     cout << "Enter number of processes: ";
     cin >> n;
 
@@ -21,40 +21,56 @@ int main() {
 
     for (int i = 0; i < n; i++) {
         p[i].pid = "P" + to_string(i + 1);
-        cin >> p[i].at >> p[i].bt;
+        cout << "Arrival Time for " << p[i].pid << ": ";
+        cin >> p[i].at;
+        cout << "Burst Time for " << p[i].pid << ": ";
+        cin >> p[i].bt;
         p[i].rt = p[i].bt;
     }
 
     queue<int> q;
-    vector<int> gantt, timeLine;
+    vector<int> order, timeline;
 
-    int time = 0, i = 0, completed = 0;
+    int time = 0, completed = 0, i = 0;
 
     vector<int> idx(n);
-    for (int i = 0; i < n; i++) idx[i] = i;
+    for (int j = 0; j < n; j++) idx[j] = j;
 
-    sort(idx.begin(), idx.end(), [&](int a, int b) {
-        return p[a].at < p[b].at;
-    });
+    // sort by arrival time (simple bubble sort style)
+    for (int a = 0; a < n; a++) {
+        for (int b = a + 1; b < n; b++) {
+            if (p[a].at > p[b].at) {
+                swap(p[a], p[b]);
+            }
+        }
+    }
 
-    q.push(idx[0]);
-    time = p[idx[0]].at;
+    q.push(0);
+    time = p[0].at;
     i = 1;
 
     while (!q.empty()) {
         int id = q.front();
         q.pop();
 
-        gantt.push_back(id);
-        timeLine.push_back(time);
+        order.push_back(id);
+        timeline.push_back(time);
 
         int exec = min(tq, p[id].rt);
         time += exec;
         p[id].rt -= exec;
 
-        while (i < n && p[idx[i]].at <= time) {
-            q.push(idx[i]);
-            i++;
+        for (int j = 0; j < n; j++) {
+            if (p[j].at <= time && p[j].rt > 0) {
+                bool already = false;
+                queue<int> temp = q;
+                while (!temp.empty()) {
+                    if (temp.front() == j) already = true;
+                    temp.pop();
+                }
+                if (!already && j != id && p[j].rt > 0)
+                    q.push(j);
+            }
         }
 
         if (p[id].rt > 0) {
@@ -63,9 +79,19 @@ int main() {
             p[id].ct = time;
             completed++;
         }
+
+        if (q.empty()) {
+            for (int j = 0; j < n; j++) {
+                if (p[j].rt > 0) {
+                    q.push(j);
+                    time = max(time, p[j].at);
+                    break;
+                }
+            }
+        }
     }
 
-    timeLine.push_back(time);
+    timeline.push_back(time);
 
     for (int i = 0; i < n; i++) {
         p[i].tat = p[i].ct - p[i].at;
@@ -75,20 +101,33 @@ int main() {
     cout << "\nGantt Chart:\n";
     cout << "-------------------------------------------------\n";
 
-    for (int id : gantt)
+    for (int id : order)
         cout << "| " << p[id].pid << " ";
 
     cout << "|\n-------------------------------------------------\n";
 
-    for (int t : timeLine)
+    for (int t : timeline)
         cout << t << "    ";
 
     cout << "\n\nPID\tAT\tBT\tCT\tTAT\tWT\n";
+    cout << "----------------------------------------\n";
+
+    float total_wt = 0, total_tat = 0;
 
     for (auto &x : p) {
-        cout << x.pid << "\t" << x.at << "\t" << x.bt << "\t"
-             << x.ct << "\t" << x.tat << "\t" << x.wt << "\n";
+        cout << x.pid << "\t"
+             << x.at << "\t"
+             << x.bt << "\t"
+             << x.ct << "\t"
+             << x.tat << "\t"
+             << x.wt << "\n";
+
+        total_wt += x.wt;
+        total_tat += x.tat;
     }
+
+    cout << "\nAverage WT: " << total_wt / n;
+    cout << "\nAverage TAT: " << total_tat / n << endl;
 
     return 0;
 }
