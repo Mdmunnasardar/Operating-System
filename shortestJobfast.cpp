@@ -5,7 +5,7 @@ using namespace std;
 struct Process {
     string pid;
     int at, bt, ct, wt, tat;
-    bool completed = false;
+    bool done = false;
 };
 
 int main() {
@@ -15,6 +15,7 @@ int main() {
 
     vector<Process> p(n);
 
+    //for input
     for (int i = 0; i < n; i++) {
         p[i].pid = "P" + to_string(i + 1);
         cout << "Arrival Time for " << p[i].pid << ": ";
@@ -23,82 +24,84 @@ int main() {
         cin >> p[i].bt;
     }
 
-    int time = 0;
-    vector<int> timeline;
-    int completed = 0;
+    int time = 0, completed = 0;
 
+    vector<string> order;
+    vector<int> timeline;
+
+    //here start excution sjf
     while (completed < n) {
+
         int idx = -1;
         int minBT = 1e9;
 
         for (int i = 0; i < n; i++) {
-            if (p[i].at <= time && !p[i].completed) {
-                if (p[i].bt < minBT) {
-                    minBT = p[i].bt;
-                    idx = i;
-                }
+            if (p[i].at <= time && !p[i].done && p[i].bt < minBT) {
+                minBT = p[i].bt;
+                idx = i;
             }
         }
 
         if (idx == -1) {
             time++;
-        } else {
-            timeline.push_back(time);
-
-            time += p[idx].bt;
-
-            p[idx].ct = time;
-            p[idx].tat = p[idx].ct - p[idx].at;
-            p[idx].wt = p[idx].tat - p[idx].bt;
-
-            p[idx].completed = true;
-            completed++;
+            continue;
         }
+
+        order.push_back(p[idx].pid);
+        timeline.push_back(time);
+
+        time += p[idx].bt;
+
+        p[idx].ct = time;
+        p[idx].tat = p[idx].ct - p[idx].at;
+        p[idx].wt = p[idx].tat - p[idx].bt;
+
+        p[idx].done = true;
+        completed++;
     }
 
     timeline.push_back(time);
 
-    cout << "\nGantt Chart:\n";
+    //gantt chart table 
+    cout << "\nGantt Chart:\n\n";
 
-    for (int i = 0; i < n; i++) {
-        cout << "--------";
-    }
+    for (int i = 0; i < n; i++) cout << "--------";
     cout << "-\n";
 
-    for (int i = 0; i < n; i++) {
-        cout << "|  " << p[i].pid << "  ";
+    for (string x : order) {
+        cout << "| " << x << " ";
     }
     cout << "|\n";
 
-    for (int i = 0; i < n; i++) {
-        cout << "--------";
-    }
+    for (int i = 0; i < n; i++) cout << "--------";
     cout << "-\n";
 
     for (int i = 0; i < timeline.size(); i++) {
-        cout << timeline[i] << "\t";
+        cout << timeline[i] << "   ";
     }
-    cout << endl;
 
-    float total_wt = 0, total_tat = 0;
+    cout << "\n";
+
+    // this table after excution 
+    float totalWT = 0, totalTAT = 0;
 
     cout << "\nPID\tAT\tBT\tCT\tTAT\tWT\n";
-    cout << "----------------------------------------\n";
+    cout << "--------------------------------\n";
 
-    for (auto &proc : p) {
-        cout << proc.pid << "\t"
-             << proc.at << "\t"
-             << proc.bt << "\t"
-             << proc.ct << "\t"
-             << proc.tat << "\t"
-             << proc.wt << endl;
+    for (auto &x : p) {
+        cout << x.pid << "\t"
+             << x.at << "\t"
+             << x.bt << "\t"
+             << x.ct << "\t"
+             << x.tat << "\t"
+             << x.wt << "\n";
 
-        total_wt += proc.wt;
-        total_tat += proc.tat;
+        totalWT += x.wt;
+        totalTAT += x.tat;
     }
 
-    cout << "\nAverage WT: " << total_wt / n;
-    cout << "\nAverage TAT: " << total_tat / n << endl;
+    cout << "\nAverage WT: " << totalWT / n;
+    cout << "\nAverage TAT: " << totalTAT / n << endl;
 
     return 0;
 }

@@ -36,7 +36,6 @@ int main() {
     vector<int> idx(n);
     for (int j = 0; j < n; j++) idx[j] = j;
 
-    // sort by arrival time (simple bubble sort style)
     for (int a = 0; a < n; a++) {
         for (int b = a + 1; b < n; b++) {
             if (p[a].at > p[b].at) {
