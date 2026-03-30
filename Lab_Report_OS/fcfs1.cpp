@@ -14,7 +14,7 @@ int main() {
 
     vector<Process> p(n);
 
-    // Input
+    // Input takes from user 
     for (int i = 0; i < n; i++) {
         p[i].id = "P" + to_string(i + 1);
         cout << "AT for " << p[i].id << ": ";
@@ -34,7 +34,7 @@ int main() {
 
     int currentTime = 0;
 
-    // Execution
+    // Execution start
     for (int i = 0; i < n; i++) {
         if (currentTime < p[i].at)
             currentTime = p[i].at;
@@ -46,7 +46,7 @@ int main() {
         p[i].wt = p[i].tat - p[i].bt;
     }
 
-    // Output
+    // Output showing
     cout << "\nPID\tAT\tBT\tCT\tTAT\tWT\n";
 
     float sumWT = 0, sumTAT = 0;

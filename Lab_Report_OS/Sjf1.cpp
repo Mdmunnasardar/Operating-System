@@ -15,7 +15,7 @@ int main() {
 
     vector<Process> p(n);
 
-    // Input
+    // Input from user
     for (int i = 0; i < n; i++) {
         p[i].id = "P" + to_string(i + 1);
         cout << "AT for " << p[i].id << ": ";
@@ -27,7 +27,7 @@ int main() {
 
     int time = 0, doneCount = 0;
 
-    // Execution
+    // Execution start
     while (doneCount < n) {
         int selected = -1;
 
@@ -54,7 +54,7 @@ int main() {
         doneCount++;
     }
 
-    // Output
+    // Output excute
     cout << "\nPID\tAT\tBT\tCT\tTAT\tWT\n";
 
     float sumWT = 0, sumTAT = 0;
