@@ -50,6 +50,7 @@ int main()
             }
         }
     }
+    
     q.push(0);
     time = p[0].at;
     i = 1;
